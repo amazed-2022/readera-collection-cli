@@ -20,10 +20,14 @@ To use all features of `readera-collection-cli`, the following should be ensured
 - Books should have **consistent, readable filenames**, e.g.:  
  `Example Author - Example Title.epub`
 - Books should include an **Author** in the _About document_ page within the ReadEra app
-- Books should include a text-based **Review** in the _About document_ page, containing the following data, **separated by semicolons**:  
- `publish date`;`rating`;`ratings count`;
 - In the ReadEra app, books should be organized into **Collections** (which are basically folders), e.g. novels, sci-fi, etc.
 - After finishing a book, it should be **marked as "Have read"** in the ReadEra app
+  <img width="540" height="440" alt="image" src="https://github.com/user-attachments/assets/43643fec-3896-44d8-b2c4-44ab0a7556a0" />
+- Books should include a text-based **Review** in the _About document_ page, containing the following data, **separated by semicolons**:  
+ `publish date`;`rating`;`ratings count`;  
+  <img width="539" height="166" alt="image" src="https://github.com/user-attachments/assets/abfad442-21f4-408e-8eef-743eeb6ef722" />  
+  (I use data from [goodreads](https://www.goodreads.com/))
+
 
 ## Features / Highlights
 ### Menu-Driven Navigation
