@@ -13,8 +13,8 @@ If you enjoy using ReadEra, **please consider supporting the developers by purch
 
 **This project is not affiliated with, endorsed by, or connected to ReadEra or its developers.**
 
-
-## Features / Highlights
+---
+<img width="188" height="54" alt="image" src="https://github.com/user-attachments/assets/b1364046-8fae-43ea-bba9-fd4f6ca86627" />
 
 To use all features of `readera-collection-cli`, the following should be ensured:
 - Books should have **consistent, readable filenames**, e.g.:  
@@ -25,6 +25,7 @@ To use all features of `readera-collection-cli`, the following should be ensured
 - In the ReadEra app, books should be organized into **Collections** (which are basically folders), e.g. novels, sci-fi, etc.
 - After finishing a book, it should be **marked as "Have read"** in the ReadEra app
 
+## Features / Highlights
 ### Menu-Driven Navigation
 - Easy-to-use  menu with numbered options  
 - Exit with the “x” option
