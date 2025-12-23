@@ -5,13 +5,12 @@ An **unofficial command-line tool** for loading and exploring book and quote dat
 **License:** GNU GPL v3.0  
 **Author:** amazed  
 **Date:** Dec 2025  
-[GitHub Repository](https://github.com/amazed-2022/collection/)
+[Version history](CHANGELOG.md)
 
 
 ## Introduction
 This project is not affiliated with, endorsed by, or connected to ReadEra or its developers, this command-line tool exists solely to help users work with their own exported data outside the app.
 ### ReadEra is an excellent Android reading application, if you enjoy using ReadEra, please consider supporting the developers by purchasing the Premium version of the official app.  
-
 
 ---
 ## Installation
