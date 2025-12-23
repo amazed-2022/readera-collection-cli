@@ -13,6 +13,18 @@ If you enjoy using ReadEra, **please consider supporting the developers by purch
 
 **This project is not affiliated with, endorsed by, or connected to ReadEra or its developers.**
 
+
+## Installation
+- **Create a backup file** in the ReadEra app (Settings / Backup & Restore)
+- **Transfer backup file to your PC** (Google Drive, Gmail, etc.)
+- **Unpack** `bak` file into a freely chosen folder
+- Only `library.json` file will be needed, the rest can be deleted
+- **Simply download** `readera-collection-cli.py` next to your extracted `library.json` file
+- **Open a Command prompt** (Press `Win + R`, type `cmd`) and navigate to the folder  
+- **Run the script**  
+  <img width="1202" height="192" alt="image" src="https://github.com/user-attachments/assets/04c30ea7-6f20-4644-8766-040bdec11f00" />
+
+  
 ---
 <img width="188" height="54" alt="image" src="https://github.com/user-attachments/assets/b1364046-8fae-43ea-bba9-fd4f6ca86627" />
 
@@ -62,13 +74,6 @@ Analyze your collection for insights and summary data
 
 ### Search (option 8)
 Search quotes across the collection using keywords
-
-
-## Installation
-- Simply download `collection.py` next to your extracted `library.json` file.
-- Open a Command prompt (Press `Win + R`, type `cmd`) and navigate to the folder  
-- Run the script  
-  <img width="1202" height="192" alt="image" src="https://github.com/user-attachments/assets/04c30ea7-6f20-4644-8766-040bdec11f00" />
 
 
 
