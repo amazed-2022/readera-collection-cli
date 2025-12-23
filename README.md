@@ -1,5 +1,5 @@
 # readera-collection-cli
-An unofficial command-line tool for loading and exploring book and quote data from ReadEra backup files.
+An unofficial **command-line tool** for loading and exploring book and quote data from ReadEra backup files.
 
 **License:** GNU GPL v3.0  
 **Author:** amazed  
@@ -8,8 +8,8 @@ An unofficial command-line tool for loading and exploring book and quote data fr
 
 
 ## Introduction
-ReadEra is an excellent Android reading application, and this **command-line tool** exists solely to help users work with their own exported data outside the app.
-If you enjoy using ReadEra, please consider supporting the developers by purchasing the Premium version in the official app.  
+ReadEra is an excellent Android reading application, and this command-line tool exists solely to help users work with their own exported data outside the app.  
+If you enjoy using ReadEra, **please consider supporting the developers by purchasing the Premium version** in the official app.  
 
 **This project is not affiliated with, endorsed by, or connected to ReadEra or its developers.**
 
