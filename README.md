@@ -1,6 +1,7 @@
 # readera-collection-cli
 An **unofficial command-line tool** for loading and exploring book and quote data from ReadEra backup file.
 
+**Current version:** v1.0.0  
 **License:** GNU GPL v3.0  
 **Author:** amazed  
 **Date:** Dec 2025  
