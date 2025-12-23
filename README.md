@@ -63,7 +63,8 @@ Search quotes across the collection using keywords
 - Simply download `collection.py` next to your extracted `library.json` file.
 - Open a Command prompt (Press `Win + R`, type `cmd`) and navigate to the folder  
 - Run the script  
-<img width="1202" height="175" alt="image" src="https://github.com/user-attachments/assets/58423114-800a-4e18-93eb-efcfb62ec4eb" />
+  <img width="1202" height="192" alt="image" src="https://github.com/user-attachments/assets/04c30ea7-6f20-4644-8766-040bdec11f00" />
+
 
 
 ## License
