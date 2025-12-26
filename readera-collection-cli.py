@@ -322,15 +322,11 @@ def print_separator_line():
 # FUNCTION: print options menu
 ##################################################
 def print_options():
-    space = "  "
     for key, value in Options_Menu.items():
         if key.isdigit():
-            if int(key) == 10:
-                space = " "
-            print(f" {int(key)}{space}--> {value}")
+            print(f" {int(key)}  -->  {value}")
         else:
-            print(f" {key}  --> {value}")
-
+            print(f" {key}  -->  {value}")
 
 ##################################################
 # FUNCTION: get option
@@ -993,5 +989,6 @@ while True:
     # start over with next iteration
     for book in The_Collection:
         book.clear_selected_set()
+
 
     os.system('cls')
