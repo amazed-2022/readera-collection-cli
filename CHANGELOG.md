@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] – 2025-12
+### Fixed
+- Corrected spacing and alignment issues in the Options menu
+
 ## [1.0.0] – 2025-12
 ### Added
 - Initial stable release
