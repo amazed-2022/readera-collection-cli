@@ -100,6 +100,8 @@ class Book:
 ##################################################
 # The Collection will be a simple list containing the Book instances
 The_Collection = []
+Authors = set()
+Titles = []
 Folders = {}
 All_Quotes_Count = 0
 Short_Quotes_Count = 0
@@ -179,11 +181,23 @@ def create_options_menu(opt_lst):
 # FUNCTION: build The Collection
 ##################################################
 def build_the_collection():
-    # these three are in the global scope
+    # these are in the global scope, indicate global to be able to modify
+    global The_Collection
     global All_Quotes_Count
     global Short_Quotes_Count
+    global Authors
+    global Titles
     global Centuries
     global Ratings_Available
+    
+    # reset globals
+    The_Collection = []
+    All_Quotes_Count = 0
+    Short_Quotes_Count = 0
+    Authors = set()
+    Titles = []
+    Centuries = set()
+    Ratings_Available = False  
 
     # open and read the JSON file
     try:
@@ -280,8 +294,13 @@ def build_the_collection():
             # add the constructed date
             this_book.have_read_time = aux_date
 
-    # gather quote counts
+    # gather titles, authors and quote counts
     for book in The_Collection:
+        if book.total_q > 0:
+            if book.author:
+                Authors.add(book.author)
+            Titles.append(book.title)
+
         All_Quotes_Count += book.total_q
         Short_Quotes_Count += book.total_short_q
 
@@ -292,8 +311,10 @@ def build_the_collection():
                 Centuries.add(century)
         if book.rating > 0.0:
             Ratings_Available = True
-
-    # set is ready, convert it to a list
+            
+    # "arrays" are ready, convert to list
+    Authors = sorted(list(Authors))
+    Titles = sorted(Titles)
     Centuries = list(Centuries)
 
     # alphabetical order by title
@@ -421,9 +442,9 @@ def print_selection_list(items, option=""):
     for i, item in enumerate(items):
         print(f"{i + 1:2d}.  -->  {item}{get_century_suffix(item) if option else ''}")
 
-############################################################
+##################################################
 # FUNCTION: return century suffix
-############################################################
+##################################################
 def get_century_suffix(cent):
     # special case for 11th, 12th, 13th, etc.
     if 10 <= cent % 100 <= 20:
@@ -476,10 +497,10 @@ def choose_a_book(attr):
 ############################################################
 # FUNCTION: user can choose an author
 ############################################################
-def choose_an_author(authors):
-    print_selection_list(authors)
-    choice = get_user_choice("author", len(authors))
-    return authors[choice - 1]
+def choose_an_author(authors_list):
+    print_selection_list(authors_list)
+    choice = get_user_choice("author", len(authors_list))
+    return authors_list[choice - 1]
 
 ############################################################
 # FUNCTION: user can choose a property
@@ -689,306 +710,302 @@ def print_folder_dict(folder_dict, total):
 ####################################################################################################
 # MAIN
 ####################################################################################################
-Options_Menu = create_options_menu(Options)
-build_the_collection();
-
-##################################################
-# main loop for printing
-##################################################
-while True:
-    # start with empty window
-    os.system('cls')
-
-    # print the main title and options
-    string = f"== The Collection =="
-    separator = '=' * len(string)
-    print(f"{separator}\n{string}\n{separator}\n")
-
-    # get option also prints the options menu
-    option = get_option();
-    print_separator_line()
-
-    ##################################################
-    # random quotes
-    ##################################################
-    if (option == "Random / All Quotes" or
-        option == "Random / Selected Author" or
-        option == "Random / Selected Folder"):
-
-        if option == "Random / All Quotes":
-            books = [book for book in The_Collection if book.total_q > 0]
-        elif option == "Random / Selected Author":
-            # avoid duplicates using set (built with set comprehension)
-            authors = sorted(list({book.author for book in The_Collection if book.author and book.total_q > 0}))
-            selected_author = choose_an_author(authors)
-            books = [book for book in The_Collection if (book.author == selected_author and book.total_q > 0)]
-        elif option == "Random / Selected Folder":
-            selected_folder = choose_a_folder(allow_select_all=False) if Folders else None
-            books = [book for book in The_Collection if (book.folder == selected_folder and book.total_q > 0)]
-
-        length = choose_quote_length()
-        print_quote_count(sum(getattr(book, LENGTH_TO_ATTR[length]) for book in books))
-        print_random_quotes(books, LENGTH_TO_METHOD[length])
-
-    ##################################################
-    # selected book section
-    ##################################################
-    elif (option == "Book / every quote" or
-          option == "Book / quote distribution"):
-
-        # get a book from the printed list
-        selected_book = choose_a_book("with_quotes")
-
+if __name__ == "__main__":
+    # create database and options menu
+    build_the_collection();
+    Options_Menu = create_options_menu(Options)
+    
+    while True:
+        # start with empty window
+        os.system('cls')
+    
+        # print the main title and options
+        string = f"== The Collection =="
+        separator = '=' * len(string)
+        print(f"{separator}\n{string}\n{separator}\n")
+    
+        # get option also prints the options menu
+        option = get_option();
+        print_separator_line()
+    
         ##################################################
-        # all quotes in page order
+        # random quotes
         ##################################################
-        if option == "Book / every quote":
-            # open output file with context manager
-            with open(f"{selected_book.title}.txt", "w", encoding="utf8") as f_output:
-                # create a list sorted by page number of all quotes in the book
-                sorted_by_page = sorted(selected_book.get_all_quotes_list(), key=lambda quote: quote.page)
-
-                print(selected_book.title)
-                print('-' * len(selected_book.title))
-                f_output.write(f"{selected_book.title}\n")
-                f_output.write(f"{'-' * len(selected_book.title)}\n")
-
-                for i, quote in enumerate(sorted_by_page):
-                    string = f"{i + 1} / {len(sorted_by_page)}  (p.{str(quote.page)})"
-                    print(string)
-                    print_wrapped_text(quote.text)
-                    print()
-                    f_output.write(f"{string}\n")
-                    f_output.write(f"{quote.text}\n\n")
-
+        if (option == "Random / All Quotes" or
+            option == "Random / Selected Author" or
+            option == "Random / Selected Folder"):
+    
+            if option == "Random / All Quotes":
+                books = [book for book in The_Collection if book.total_q > 0]
+            elif option == "Random / Selected Author":
+                selected_author = choose_an_author(Authors)
+                books = [book for book in The_Collection if (book.author == selected_author and book.total_q > 0)]
+            elif option == "Random / Selected Folder":
+                selected_folder = choose_a_folder(allow_select_all=False) if Folders else None
+                books = [book for book in The_Collection if (book.folder == selected_folder and book.total_q > 0)]
+    
+            length = choose_quote_length()
+            print_quote_count(sum(getattr(book, LENGTH_TO_ATTR[length]) for book in books))
+            print_random_quotes(books, LENGTH_TO_METHOD[length])
+    
         ##################################################
-        # quote distribution
+        # selected book section
         ##################################################
-        elif option == "Book / quote distribution":
-            print(f"{selected_book.title}\n{'-' * len(selected_book.title)}\n")
-
-            # use terminal width as the base of the diagram size
-            space = "    "
-            columns = get_terminal_columns() - 10
-            rows = round(columns * 0.2)
-            res = selected_book.pages_count / columns
-
-            # collect the distribution of quotes based on calculated resolution
-            # use length of each quote instead of simply just the numbers
-            q_distr = []
-            for i in range(columns):
-                q_distr.append(0)
-                start_page = res * i
-                end_page = res * (i + 1)
-                for quote in selected_book.get_all_quotes_list():
-                    if (quote.page > start_page) and (quote.page <= end_page):
-                        q_distr[i] += len(quote.text)
-
-            # map the distribution from (0) to (rows)
-            old_min, old_max = min(q_distr), max(q_distr)
-            new_min, new_max = 0, rows
-            mapped_distr = [(new_max - new_min) * (x - old_min) / (old_max - old_min) + new_min for x in q_distr]
-
-            print(f"{space}↑")
-            # range is exclusive of the end value, but it's not a problem that rows number
-            # will not be reached, because in this way, compare value (new max - i) will
-            # not reach zero, so a row full of '*' character will not be printed
-            for i in range(rows):
-                row_str_list = []
-                for j in range(columns):
-                    row_str_list.append('*' if mapped_distr[j] >= (new_max - i) else ' ')
-
-                # print the updated row immediately
-                print(f"{space}|{''.join(row_str_list)}")
-
-            print(f"{space}{'-' * columns}→")
-            print(f"{space}1{' ' * (columns - len(str(selected_book.pages_count)) + 1)}{selected_book.pages_count}")
-
-    ##################################################
-    # generate book list by chosen property
-    ##################################################
-    elif option == "Book / list by property":
-
-        book_property = choose_a_property()
-
-        if book_property == "added on":
-            sorted_books = sorted(The_Collection, key=lambda book: book.file_modified_time, reverse=True)
-        elif book_property == "reading now":
-            sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
-        elif book_property == "finished list":
-            sorted_books = sorted(The_Collection, key=lambda book: book.have_read_time, reverse=True)
-        elif book_property == "read duration":
-            sorted_books = sorted(The_Collection, key=lambda book: book.first_q_date, reverse=True)
-        elif book_property == "publish date":
-            sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
-            century = choose_a_century()
-        elif book_property == "number of quotes":
-            sorted_books = sorted(The_Collection, key=lambda book: book.total_q, reverse=True)
-        elif book_property == "quote/page ratio":
-            sorted_books = sorted(The_Collection, key=lambda book: book.q_per_page, reverse=True)
-        elif book_property == "rating":
-            sorted_books = sorted(The_Collection, key=lambda book: book.rating, reverse=True)
-        elif book_property == "folder":
-            sorted_books = sorted(The_Collection, key=lambda book: book.title, reverse=False)
-
-        # choose function returns none if all is requested
-        not_an_exception = book_property not in ["read duration", "reading now", "finished list"]
-        folder = choose_a_folder() if (Folders and not_an_exception) else None
-
-        while True:
-            for book in sorted_books:
-                if not folder or book.folder == folder:
-                    # print book data according to chosen property
-                    if book_property == "added on":
-                        print(f"  -->  {book.file_modified_time.strftime('%Y-%b-%d')}  /  {book.title}")
-
-                    elif book_property == "reading now":
-                        if (book.activity_time != 0) and (book.have_read_time.year == 1970):
-                            print(f"  -->  "
-                                  f"{book.published_date:4d}  /  "
-                                  f"{book.rating:.2f}  /  "
-                                  f"{book.ratings_count:>{6}}k  /  "
-                                  f"{book.pages_count:4d} pages  /  "
-                                  f"{book.title}")
-
-                    elif book_property == "finished list" or book_property == "continued_as_publish_date_of_finished":
-                        if book.have_read_time.year > 1970:
-                            if book_property == "finished list":
-                                print(f"  -->  {book.have_read_time.strftime('%Y-%b-%d')}  /  {book.title}")
-                            else:
-                                print(f"  -->  {book.published_date}  /  {book.title}")
-
-                    elif book_property == "read duration":
-                        if ( book.first_q_date > READ_DATE_LIST_START and
-                            (book.last_q_date - book.first_q_date) > ONE_DAY_IN_SECONDS and
-                             book.title not in EXCLUDED_TITLES_FROM_READ_DURATION and
-                             book.have_read_time.year > 1970):
-                            dt_first = datetime.datetime.fromtimestamp(book.first_q_date)
-                            elapsed_days = (book.have_read_time - dt_first).days + 1
-                            if dt_first.year == book.have_read_time.year:
-                                dt_string = f"{dt_first.strftime('%Y %b.%d')} - {book.have_read_time.strftime('%b.%d')}"
-                            else:
-                                dt_string = f"{dt_first.strftime('%Y %b.%d')} - {book.have_read_time.strftime('%Y %b.%d')}"
-
-                            print(f"  -->  {dt_string}{' ' * (25-len(dt_string))}  /  "
-                                  f"{book.title}{' ' * (62-len(book.title))}"
-                                  f"/ {book.pages_count:4d} pages  /  {int((book.pages_count / elapsed_days)+0.5):2d} / day")
-
-                    elif book_property == "publish date":
-                        if century:
-                            date_match = ((century - 1) * 100) <= book.published_date < (century * 100)
-                        if not century or date_match:
+        elif (option == "Book / every quote" or
+              option == "Book / quote distribution"):
+    
+            # get a book from the printed list
+            selected_book = choose_a_book("with_quotes")
+    
+            ##################################################
+            # all quotes in page order
+            ##################################################
+            if option == "Book / every quote":
+                # open output file with context manager
+                with open(f"{selected_book.title}.txt", "w", encoding="utf8") as f_output:
+                    # create a list sorted by page number of all quotes in the book
+                    sorted_by_page = sorted(selected_book.get_all_quotes_list(), key=lambda quote: quote.page)
+    
+                    print(selected_book.title)
+                    print('-' * len(selected_book.title))
+                    f_output.write(f"{selected_book.title}\n")
+                    f_output.write(f"{'-' * len(selected_book.title)}\n")
+    
+                    for i, quote in enumerate(sorted_by_page):
+                        string = f"{i + 1} / {len(sorted_by_page)}  (p.{str(quote.page)})"
+                        print(string)
+                        print_wrapped_text(quote.text)
+                        print()
+                        f_output.write(f"{string}\n")
+                        f_output.write(f"{quote.text}\n\n")
+    
+            ##################################################
+            # quote distribution
+            ##################################################
+            elif option == "Book / quote distribution":
+                print(f"{selected_book.title}\n{'-' * len(selected_book.title)}\n")
+    
+                # use terminal width as the base of the diagram size
+                space = "    "
+                columns = get_terminal_columns() - 10
+                rows = round(columns * 0.2)
+                res = selected_book.pages_count / columns
+    
+                # collect the distribution of quotes based on calculated resolution
+                # use length of each quote instead of simply just the numbers
+                q_distr = []
+                for i in range(columns):
+                    q_distr.append(0)
+                    start_page = res * i
+                    end_page = res * (i + 1)
+                    for quote in selected_book.get_all_quotes_list():
+                        if (quote.page > start_page) and (quote.page <= end_page):
+                            q_distr[i] += len(quote.text)
+    
+                # map the distribution from (0) to (rows)
+                old_min, old_max = min(q_distr), max(q_distr)
+                new_min, new_max = 0, rows
+                mapped_distr = [(new_max - new_min) * (x - old_min) / (old_max - old_min) + new_min for x in q_distr]
+    
+                print(f"{space}↑")
+                # range is exclusive of the end value, but it's not a problem that rows number
+                # will not be reached, because in this way, compare value (new max - i) will
+                # not reach zero, so a row full of '*' character will not be printed
+                for i in range(rows):
+                    row_str_list = []
+                    for j in range(columns):
+                        row_str_list.append('*' if mapped_distr[j] >= (new_max - i) else ' ')
+    
+                    # print the updated row immediately
+                    print(f"{space}|{''.join(row_str_list)}")
+    
+                print(f"{space}{'-' * columns}→")
+                print(f"{space}1{' ' * (columns - len(str(selected_book.pages_count)) + 1)}{selected_book.pages_count}")
+    
+        ##################################################
+        # generate book list by chosen property
+        ##################################################
+        elif option == "Book / list by property":
+    
+            book_property = choose_a_property()
+    
+            if book_property == "added on":
+                sorted_books = sorted(The_Collection, key=lambda book: book.file_modified_time, reverse=True)
+            elif book_property == "reading now":
+                sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
+            elif book_property == "finished list":
+                sorted_books = sorted(The_Collection, key=lambda book: book.have_read_time, reverse=True)
+            elif book_property == "read duration":
+                sorted_books = sorted(The_Collection, key=lambda book: book.first_q_date, reverse=True)
+            elif book_property == "publish date":
+                sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
+                century = choose_a_century()
+            elif book_property == "number of quotes":
+                sorted_books = sorted(The_Collection, key=lambda book: book.total_q, reverse=True)
+            elif book_property == "quote/page ratio":
+                sorted_books = sorted(The_Collection, key=lambda book: book.q_per_page, reverse=True)
+            elif book_property == "rating":
+                sorted_books = sorted(The_Collection, key=lambda book: book.rating, reverse=True)
+            elif book_property == "folder":
+                sorted_books = sorted(The_Collection, key=lambda book: book.title, reverse=False)
+    
+            # choose function returns none if all is requested
+            not_an_exception = book_property not in ["read duration", "reading now", "finished list"]
+            folder = choose_a_folder() if (Folders and not_an_exception) else None
+    
+            while True:
+                for book in sorted_books:
+                    if not folder or book.folder == folder:
+                        # print book data according to chosen property
+                        if book_property == "added on":
+                            print(f"  -->  {book.file_modified_time.strftime('%Y-%b-%d')}  /  {book.title}")
+    
+                        elif book_property == "reading now":
+                            if (book.activity_time != 0) and (book.have_read_time.year == 1970):
+                                print(f"  -->  "
+                                    f"{book.published_date:4d}  /  "
+                                    f"{book.rating:.2f}  /  "
+                                    f"{book.ratings_count:>{6}}k  /  "
+                                    f"{book.pages_count:4d} pages  /  "
+                                    f"{book.title}")
+    
+                        elif book_property == "finished list" or book_property == "continued_as_publish_date_of_finished":
+                            if book.have_read_time.year > 1970:
+                                if book_property == "finished list":
+                                    print(f"  -->  {book.have_read_time.strftime('%Y-%b-%d')}  /  {book.title}")
+                                else:
+                                    print(f"  -->  {book.published_date}  /  {book.title}")
+    
+                        elif book_property == "read duration":
+                            if ( book.first_q_date > READ_DATE_LIST_START and
+                                (book.last_q_date - book.first_q_date) > ONE_DAY_IN_SECONDS and
+                                book.title not in EXCLUDED_TITLES_FROM_READ_DURATION and
+                                book.have_read_time.year > 1970):
+                                dt_first = datetime.datetime.fromtimestamp(book.first_q_date)
+                                elapsed_days = (book.have_read_time - dt_first).days + 1
+                                if dt_first.year == book.have_read_time.year:
+                                    dt_string = f"{dt_first.strftime('%Y %b.%d')} - {book.have_read_time.strftime('%b.%d')}"
+                                else:
+                                    dt_string = f"{dt_first.strftime('%Y %b.%d')} - {book.have_read_time.strftime('%Y %b.%d')}"
+    
+                                print(f"  -->  {dt_string}{' ' * (25-len(dt_string))}  /  "
+                                    f"{book.title}{' ' * (62-len(book.title))}"
+                                    f"/ {book.pages_count:4d} pages  /  {int((book.pages_count / elapsed_days)+0.5):2d} / day")
+    
+                        elif book_property == "publish date":
+                            if century:
+                                date_match = ((century - 1) * 100) <= book.published_date < (century * 100)
+                            if not century or date_match:
+                                date_data = f"{book.published_date:4d}" if book.published_date else " N/A"
+                                pages_count = f"{book.pages_count:4d}" if book.pages_count else " N/A"
+                                print(f"  -->  {date_data}  /  {pages_count} pages  /  {book.title}")
+    
+                        elif book_property == "number of quotes":
+                            if book.total_q > 0:
+                                print(f"  -->  {book.total_q:3d}  /  {book.title}")
+    
+                        elif book_property == "quote/page ratio":
+                            if book.q_per_page > 0.0:
+                                # remove funny character
+                                clean_title = book.title.replace('\u200b', '').strip()
+                                string = (f"  -->  {book.q_per_page:.3f}  /  {clean_title}")
+                                print(f"{string}{' ' * (85-len(string))} ( {book.total_q:3d} / {book.pages_count:4d} )")
+    
+                        elif book_property == "rating" or book_property == "continued_as_ratings_count":
+                            print(f"  -->  {book.rating:.2f}  /  {book.ratings_count:>{6}}k  /  {book.title}")
+                        
+                        elif book_property == "folder":
                             date_data = f"{book.published_date:4d}" if book.published_date else " N/A"
                             pages_count = f"{book.pages_count:4d}" if book.pages_count else " N/A"
                             print(f"  -->  {date_data}  /  {pages_count} pages  /  {book.title}")
-
-                    elif book_property == "number of quotes":
-                        if book.total_q > 0:
-                            print(f"  -->  {book.total_q:3d}  /  {book.title}")
-
-                    elif book_property == "quote/page ratio":
-                        if book.q_per_page > 0.0:
-                            # remove funny character
-                            clean_title = book.title.replace('\u200b', '').strip()
-                            string = (f"  -->  {book.q_per_page:.3f}  /  {clean_title}")
-                            print(f"{string}{' ' * (85-len(string))} ( {book.total_q:3d} / {book.pages_count:4d} )")
-
-                    elif book_property == "rating" or book_property == "continued_as_ratings_count":
-                        print(f"  -->  {book.rating:.2f}  /  {book.ratings_count:>{6}}k  /  {book.title}")
-                    
-                    elif book_property == "folder":
-                        date_data = f"{book.published_date:4d}" if book.published_date else " N/A"
-                        pages_count = f"{book.pages_count:4d}" if book.pages_count else " N/A"
-                        print(f"  -->  {date_data}  /  {pages_count} pages  /  {book.title}")
-                        
-
-            if book_property != "rating" and book_property != "finished list":
-                break
-            else:
-                # rating and finished lists are special
-                print_separator_line()
-                input()
-                if book_property == "rating":
-                    # print based on ratings count in the second round
-                    sorted_books = sorted(The_Collection, key=lambda book: book.ratings_count, reverse=True)
-                    book_property = "continued_as_ratings_count"
-                elif book_property == "finished list":
-                    # print based on ratings count
-                    sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
-                    book_property = "continued_as_publish_date_of_finished"
-                else:
+                            
+    
+                if book_property != "rating" and book_property != "finished list":
                     break
-
-        print_separator_line()
-
-    ##################################################
-    # statistics
-    ##################################################
-    elif option == "Statistics":
-        print_statistics()
-
-    ##################################################
-    # search
-    ##################################################
-    elif option == "Search":
-        while True:
-            search_prompt = "Search for at least 3 characters: "
-            str_to_search = input(search_prompt).lower()
-            print('-' * (len(search_prompt) + len(str_to_search)))
-
-            if len(str_to_search) >= 3:
-                counter = 0
-                for book in The_Collection:
-                    match_in_book = False
-
-                    for quote in book.get_all_quotes_list():
-                        quote_text = quote.text.lower()
-
-                        if str_to_search in quote_text:
-
-                            # check if it's the first match in this book
-                            if not match_in_book:
-                                print_separator_line()
-                                print(f"{book.title}\n{'-' * len(book.title)}\n")
-                                match_in_book = True
-
-                            # print the quote with the search term highlighted
-                            print_wrapped_text(quote.text.replace(str_to_search, str_to_search.upper()))
-                            print('\n')
-
-                            # use findall, because a quote may contain the searched word multiple times
-                            counter += len(re.findall(str_to_search, quote_text))
-
-                result = f"Matched {counter} time{'s' if counter > 1 else ''}."
-                print(result if counter else "No match found.")
-                print('-' * len(result) if counter else '')
-
-            elif str_to_search == 'x':
-                break
-            else:
-                print("Incorrect input.")
-            print('\n')
+                else:
+                    # rating and finished lists are special
+                    print_separator_line()
+                    input()
+                    if book_property == "rating":
+                        # print based on ratings count in the second round
+                        sorted_books = sorted(The_Collection, key=lambda book: book.ratings_count, reverse=True)
+                        book_property = "continued_as_ratings_count"
+                    elif book_property == "finished list":
+                        # print based on ratings count
+                        sorted_books = sorted(The_Collection, key=lambda book: book.published_date, reverse=True)
+                        book_property = "continued_as_publish_date_of_finished"
+                    else:
+                        break
+    
             print_separator_line()
-
-    ##################################################
-    # error
-    ##################################################
-    elif option == "Something went wrong":
-        print("Error.")
-
-    ##################################################
-    # hold on and clear sceen before next iteration
-    ##################################################
-    if (option != "Random / All Quotes"        and
-        option != "Random / Short Quotes"      and
-        option != "Random / Selected Author"   and
-        option != "Random / Selected Folder"   and
-        option != "Search"):
-        input()
-
-    # start over with next iteration
-    for book in The_Collection:
-        book.clear_selected_set()
-
-
-    os.system('cls')
+    
+        ##################################################
+        # statistics
+        ##################################################
+        elif option == "Statistics":
+            print_statistics()
+    
+        ##################################################
+        # search
+        ##################################################
+        elif option == "Search":
+            while True:
+                search_prompt = "Search for at least 3 characters: "
+                str_to_search = input(search_prompt).lower()
+                print('-' * (len(search_prompt) + len(str_to_search)))
+    
+                if len(str_to_search) >= 3:
+                    counter = 0
+                    for book in The_Collection:
+                        match_in_book = False
+    
+                        for quote in book.get_all_quotes_list():
+                            quote_text = quote.text.lower()
+    
+                            if str_to_search in quote_text:
+    
+                                # check if it's the first match in this book
+                                if not match_in_book:
+                                    print_separator_line()
+                                    print(f"{book.title}\n{'-' * len(book.title)}\n")
+                                    match_in_book = True
+    
+                                # print the quote with the search term highlighted
+                                print_wrapped_text(quote.text.replace(str_to_search, str_to_search.upper()))
+                                print('\n')
+    
+                                # use findall, because a quote may contain the searched word multiple times
+                                counter += len(re.findall(str_to_search, quote_text))
+    
+                    result = f"Matched {counter} time{'s' if counter > 1 else ''}."
+                    print(result if counter else "No match found.")
+                    print('-' * len(result) if counter else '')
+    
+                elif str_to_search == 'x':
+                    break
+                else:
+                    print("Incorrect input.")
+                print('\n')
+                print_separator_line()
+    
+        ##################################################
+        # error
+        ##################################################
+        elif option == "Something went wrong":
+            print("Error.")
+    
+        ##################################################
+        # hold on and clear sceen before next iteration
+        ##################################################
+        if (option != "Random / All Quotes"        and
+            option != "Random / Short Quotes"      and
+            option != "Random / Selected Author"   and
+            option != "Random / Selected Folder"   and
+            option != "Search"):
+            input()
+    
+        # start over with next iteration
+        for book in The_Collection:
+            book.clear_selected_set()
+    
+        os.system('cls')
